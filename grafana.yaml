@@ -1,0 +1,250 @@
+admin:
+  existingSecret: ""
+  existingSecretPasswordKey: password
+  password: grafanaadmin
+  user: admin
+alerting:
+  configMapName: ""
+clusterDomain: cluster.local
+common:
+  exampleValue: common-chart
+  global:
+    imagePullSecrets: []
+    imageRegistry: ""
+    storageClass: ""
+commonAnnotations: {}
+commonLabels: {}
+config:
+  grafanaIniConfigMap: ""
+  grafanaIniSecret: ""
+  useGrafanaIniFile: false
+dashboardsConfigMaps: []
+dashboardsProvider:
+  configMapName: ""
+  enabled: false
+datasources:
+  secretDefinition: {}
+  secretName: ""
+diagnosticMode:
+  args:
+  - infinity
+  command:
+  - sleep
+  enabled: false
+extraDeploy: []
+fullnameOverride: ""
+global:
+  imagePullSecrets: []
+  imageRegistry: ""
+  storageClass: ""
+grafana:
+  affinity: {}
+  args: []
+  command: []
+  containerPorts:
+    grafana: 3000
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    enabled: true
+    privileged: false
+    readOnlyRootFilesystem: false
+    runAsNonRoot: true
+    runAsUser: 1001
+    seccompProfile:
+      type: RuntimeDefault
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+  customStartupProbe: {}
+  extraConfigmaps: []
+  extraEnvVars: []
+  extraEnvVarsCM: ""
+  extraEnvVarsSecret: ""
+  extraPorts: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  hostAliases: []
+  initContainers: []
+  lifecycleHooks: {}
+  livenessProbe:
+    enabled: true
+    failureThreshold: 6
+    initialDelaySeconds: 120
+    path: /api/health
+    periodSeconds: 10
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 5
+  nodeAffinityPreset:
+    key: ""
+    type: ""
+    values: []
+  nodeSelector: {}
+  podAffinityPreset: ""
+  podAnnotations: {}
+  podAntiAffinityPreset: soft
+  podLabels: {}
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+  priorityClassName: ""
+  readinessProbe:
+    enabled: true
+    failureThreshold: 6
+    initialDelaySeconds: 30
+    path: /api/health
+    periodSeconds: 10
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 5
+  replicaCount: 1
+  resources:
+    limits: {}
+    requests: {}
+  schedulerName: ""
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 6
+    initialDelaySeconds: 30
+    path: /api/health
+    periodSeconds: 10
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 5
+  terminationGracePeriodSeconds: ""
+  tolerations: []
+  topologySpreadConstraints: []
+  updateStrategy:
+    type: RollingUpdate
+image:
+  digest: ""
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+  registry: docker.io
+  repository: bitnami/grafana
+  tag: 10.2.3-debian-11-r2
+imageRenderer:
+  callbackURL: ""
+  enabled: false
+  serverURL: ""
+ingress:
+  annotations: {}
+  apiVersion: ""
+  enabled: false
+  extraHosts: []
+  extraPaths: []
+  extraRules: []
+  extraTls: []
+  hostname: grafana.local
+  ingressClassName: ""
+  path: /
+  pathType: ImplementationSpecific
+  secrets: []
+  selfSigned: false
+  tls: false
+kubeVersion: ""
+ldap:
+  allowSignUp: false
+  basedn: ""
+  binddn: ""
+  bindpw: ""
+  configMapName: ""
+  configuration: ""
+  enabled: false
+  extraConfiguration: ""
+  searchAttribute: uid
+  searchFilter: ""
+  secretName: ""
+  tls:
+    CAFilename: ""
+    certFilename: ""
+    certKeyFilename: ""
+    certificatesMountPath: /opt/bitnami/grafana/conf/ldap/
+    certificatesSecret: ""
+    enabled: false
+    skipVerify: false
+    startTls: false
+  uri: ""
+metrics:
+  enabled: false
+  prometheusRule:
+    additionalLabels: {}
+    enabled: false
+    namespace: ""
+    rules: []
+  service:
+    annotations:
+      prometheus.io/path: /metrics
+      prometheus.io/port: "3000"
+      prometheus.io/scrape: "true"
+  serviceMonitor:
+    enabled: false
+    honorLabels: false
+    interval: ""
+    jobLabel: ""
+    labels: {}
+    metricRelabelings: []
+    namespace: ""
+    relabelings: []
+    scrapeTimeout: ""
+    selector: {}
+nameOverride: ""
+notifiers:
+  configMapName: ""
+persistence:
+  accessMode: ReadWriteOnce
+  accessModes: []
+  annotations: {}
+  enabled: true
+  existingClaim: ""
+  size: 10Gi
+  storageClass: ""
+plugins: ""
+service:
+  annotations: {}
+  clusterIP: ""
+  externalTrafficPolicy: Cluster
+  extraPorts: []
+  loadBalancerClass: ""
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  nodePorts:
+    grafana: ""
+  ports:
+    grafana: 3000
+  sessionAffinity: None
+  sessionAffinityConfig: {}
+  type: ClusterIP
+serviceAccount:
+  annotations: {}
+  automountServiceAccountToken: false
+  create: true
+  name: ""
+smtp:
+  enabled: false
+  existingSecret: ""
+  existingSecretPasswordKey: password
+  existingSecretUserKey: user
+  fromAddress: ""
+  fromName: ""
+  host: ""
+  password: password
+  skipVerify: "false"
+  user: user
+volumePermissions:
+  containerSecurityContext:
+    runAsUser: 0
+  enabled: false
+  image:
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+    registry: docker.io
+    repository: bitnami/os-shell
+    tag: 11-debian-11-r93
+  resources:
+    limits: {}
+    requests: {}

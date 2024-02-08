@@ -1,0 +1,175 @@
+MIRTH
+A.DOCKER
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+apt-cache policy docker-ce
+sudo apt install docker-ce
+sudo systemctl status docker
+
+
+B.MIRTH 
+[ https://forums.mirthproject.io/articles/175025-using-connect-with-docker ]
+[ https://hub.docker.com/r/nextgenhealthcare/connect/ ]
+sudo docker run –-name mirth -d -p 8443:8443 nextgenhealthcare/connect
+	--name mirth names your container "mirth"
+	-d runs your container in the background
+	-p 8443:8443 maps your OS port 8443 to the container's port 8443
+	nextgenhealthcare/connect tells docker what image to use, in this case the latest image, when creating your container
+	
+* Status of Container;
+sudo docker ps -a
+
+* Logs of docker
+docker logs mirth
+
+* Stop and remove container
+sudo docker stop mirth
+sudo docker rm mirth
+
+To start a Connect container using one or more environment variables you use the -e parameter.
+
+docker run --name mirth -e DATABASE='derby' -e VMOPTIONS='-Xmx512m' -p 8443:8443 nextgenhealthcare/connect
+
+Most of the environment variables offer an easy way to get custom properties 
+into Connect server’s mirth.properties file. 
+As you may know, there are a ton of optional properties that can go into this file 
+(For a full list, search the User Guide for “mirth.properties”), 
+so how do you configure all of the others? We added a system that allows you 
+to add any arbitrary property. To do this you would use a special environment 
+variable syntax where you start with _MP_ then replace - with _ then replace . with __. 
+Here’s an example of how to add the property database-readonly.max-connections = 25:
+
+docker run --name connect -e _MP_DATABASE__READONLY_MAX__CONNECTIONS='25' -p 8443:8443 nextgenhealthcare/connect
+
+
+Adding all of your environment variables as command line arguments can get pretty tedious 
+and verbose but Docker supports loading environment variables from a file.
+
+Here’s an example file (be sure to substitute serverip with the correct IP):
+
+myenvfile.txt [mirthenv.txt]
+
+DATABASE=postgres
+DATABASE_URL=jdbc:postgresql://serverip:5432/mirthdb
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+KEYSTORE_STOREPASS=changeme
+KEYSTORE_KEYPASS=changeme
+VMOPTIONS=-Xmx512m
+
+And Docker using the file:
+docker run --env-file=myenvfile.txt -p 8443:8443 nextgenhealthcare/connect
+
+
+C.PostgreSQL
+
+https://ubuntu.com/server/docs/databases-postgresql
+
+
+D. Azure Environment
+Ubuntu 22.04
+IP
+SSH Private Key; download mirth_key.pem
+admin ; mirthadmin
+
+docker image;
+secret.properties
+	database.username=mirthuser
+	database.password=mirthpassword
+	keystore.storepass=docker_storepass
+	keystore.keypass=docker_keypass
+pgsql_user.txt
+	mirthuser
+pgsql_pw.txt
+	mirthpassword
+mirth_uber_stack.yml
+*************************************************
+version: '3.1'
+services:
+  mc:
+    image: nextgenhealthcare/connect
+    container_name: connect
+    environment:
+      - DATABASE=postgres
+      - DATABASE_URL=jdbc:postgresql://db:5432/mirthdb
+      - DATABASE_MAX_CONNECTIONS=20
+      - VMOPTIONS=-Xmx512m
+    secrets:
+      - mirth_properties
+    volumes:
+      - /local/path/to/appdata:/opt/connect/appdata
+    ports:
+      - 8080:8080/tcp
+      - 8443:8443/tcp
+    depends_on:
+      - db
+  db:
+    image: postgres
+    container_name: pgsql
+    environment:
+      - POSTGRES_DB=mirthdb
+      - POSTGRES_USER_FILE=/run/secrets/postgres-user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password
+    secrets:
+      - postgres-user
+      - postgres-password
+    volumes:
+      - /local/path/to/pgsql_volume:/var/lib/postgresql/data
+    expose:
+      - 5432
+secrets:
+  mirth_properties:
+    file: secret.properties
+  postgres-user:
+    file: /local/path/to/pgsql_user.txt
+  postgres-password:
+    file: /local/path/to/pgsql_pw.txt
+
+*************************************************
+docker compose -f mirth_uber_stack.yml up -d
+
+ssh -i C:\Users\sadettin.demir\Downloads\mirth_key.pem mirthadmin@20.56.158.54
+
+*************************************************
+version: '3.1'
+services:
+  mc:
+    image: nextgenhealthcare/connect
+    container_name: mirth
+    environment:
+      - DATABASE=postgres
+      - DATABASE_URL=jdbc:postgresql://db:5432/mirthdb
+      - DATABASE_MAX_CONNECTIONS=20
+      - VMOPTIONS=-Xmx512m
+    secrets:
+      - mirth_properties
+    volumes:
+      - /mirth/appdata:/opt/connect/appdata
+    ports:
+      - 8080:8080/tcp
+      - 8443:8443/tcp
+    depends_on:
+      - db
+  db:
+    image: postgres
+    container_name: pgsql
+    environment:
+      - POSTGRES_DB=mirthdb
+      - POSTGRES_USER_FILE=/run/secrets/postgres-user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres-password
+    secrets:
+      - postgres-user
+      - postgres-password
+    volumes:
+      - /mirth/pgsql_volume:/var/lib/postgresql/data
+    expose:
+      - 5432
+secrets:
+  mirth_properties:
+    file: secret.properties
+  postgres-user:
+    file: pgsql_user.txt
+  postgres-password:
+    file: pgsql_pw.txt
